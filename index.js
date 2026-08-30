@@ -4,7 +4,7 @@ import http from 'http';
 
 const DIFY_API_KEY = process.env.DIFY_API_KEY;
 const DIFY_API_URL = 'https://api.dify.ai/v1/chat-messages';
-const YOUR_NUMBER = '92300XXXXXXX' // <-- YAHAN APNA NUMBER LIKHO
+const YOUR_NUMBER = '923252874471' // <-- YAHAN APNA NUMBER LIKHO
 
 async function startBot() {
     const { state, saveCreds } = await useMultiFileAuthState('auth_info_baileys')
