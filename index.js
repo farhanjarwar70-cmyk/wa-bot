@@ -39,4 +39,13 @@ async function startBot() {
                     query: text,
                     response_mode: "blocking",
                     user: msg.key.remoteJid
-                }, { headers: { 'Authorization': `Bearer ${
+                }, { headers: { 'Authorization': `Bearer ${DIFY_API_KEY}` }})
+                await sock.sendMessage(msg.key.remoteJid, { text: res.data.answer })
+            }
+        }
+    })
+}
+startBot()
+
+// Railway ke liye
+http.createServer().listen(process.env.PORT || 3000);
