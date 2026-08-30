@@ -1,27 +1,30 @@
 import makeWASocket, { DisconnectReason, useMultiFileAuthState } from '@whiskeysockets/baileys';
 import axios from 'axios';
 import http from 'http';
-import qrcode from 'qrcode-terminal'; // QR ke liye naya package
 
 const DIFY_API_KEY = process.env.DIFY_API_KEY;
 const DIFY_API_URL = 'https://api.dify.ai/v1/chat-messages';
+const YOUR_NUMBER = '923252874471' // <-- apna number yahan
 
 async function startBot() {
     const { state, saveCreds } = await useMultiFileAuthState('auth_info_baileys')
 
     const sock = makeWASocket({
         auth: state,
-        printQRInTerminal: true // QR ON kar diya
+        printQRInTerminal: false // QR band
     })
+
+    if (!state.creds.registered) {
+        setTimeout(async () => {
+            let code = await sock.requestPairingCode(YOUR_NUMBER)
+            console.log("========== PAIRING CODE: " + code + " ==========")
+        }, 3000)
+    }
 
     sock.ev.on('creds.update', saveCreds)
 
     sock.ev.on('connection.update', (update) => {
-        const { connection, lastDisconnect, qr } = update
-        if(qr){
-            console.log("Scan this QR from WhatsApp > Linked Devices")
-            qrcode.generate(qr, {small: true}) // Railway logs mein QR ban jayega
-        }
+        const { connection, lastDisconnect } = update
         if(connection === 'open') console.log('Bot is Online!')
         if(connection === 'close') {
             const shouldReconnect = lastDisconnect.error?.output?.statusCode!== DisconnectReason.loggedOut
@@ -47,5 +50,4 @@ async function startBot() {
 }
 startBot()
 
-// Railway ke liye
 http.createServer().listen(process.env.PORT || 3000);
