@@ -1,63 +1,59 @@
-import { default as makeWASocket, DisconnectReason, useMultiFileAuthState, Browsers } from '@whiskeysockets/baileys';
+import makeWASocket, { useMultiFileAuthState, DisconnectReason } from '@whiskeysockets/baileys';
 import axios from 'axios';
 import http from 'http';
-import fs from 'fs';
 
 const DIFY_API_KEY = process.env.DIFY_API_KEY;
 const DIFY_API_URL = 'https://api.dify.ai/v1/chat-messages';
-const YOUR_NUMBER = '923252874471';
+const NUMBER = '923252874471'; // apna number 92 wala
 
-let reconnecting = false;
-
-async function startBot() {
-    if(reconnecting) return;
-    reconnecting = true;
-
-    const { state, saveCreds } = await useMultiFileAuthState('auth_info_baileys');
+async function connect() {
+    const { state, saveCreds } = await useMultiFileAuthState('auth');
 
     const sock = makeWASocket({
         auth: state,
-        printQRInTerminal: false,
-        browser: Browsers.macOS('Desktop')
+        printQRInTerminal: false
     });
 
     sock.ev.on('creds.update', saveCreds);
 
+    // Pehli baar pairing code
     if (!state.creds.registered) {
         setTimeout(async () => {
-            let code = await sock.requestPairingCode(YOUR_NUMBER);
-            code = code?.match(/.{1,4}/g)?.join("-") || code;
-            console.log("\n========== PAIRING CODE: " + code + " ==========\n");
+            const code = await sock.requestPairingCode(NUMBER);
+            console.log('PAIRING CODE:', code.match(/.{1,4}/g).join('-'));
         }, 3000);
     }
 
+    // Connection
     sock.ev.on('connection.update', (update) => {
         const { connection, lastDisconnect } = update;
-        if(connection === 'open') {
-            console.log('✅ Bot Online');
-            reconnecting = false;
-        }
-        if(connection === 'close') {
-            if(lastDisconnect?.error?.output?.statusCode === DisconnectReason.loggedOut) {
-                fs.rmSync('auth_info_baileys', { recursive: true, force: true });
-            }
-            setTimeout(() => { reconnecting = false; startBot(); }, 10000);
+        if (connection === 'open') console.log('Bot Connected');
+        if (connection === 'close') {
+            const shouldReconnect = lastDisconnect.error?.output?.statusCode!== DisconnectReason.loggedOut;
+            if (shouldReconnect) connect();
         }
     });
 
-    sock.ev.on('messages.upsert', async m => {
+    // Message
+    sock.ev.on('messages.upsert', async (m) => {
         const msg = m.messages[0];
         if (!msg.key.fromMe && msg.message) {
             const text = msg.message.conversation || msg.message.extendedTextMessage?.text;
-            if(text){
+            if (text) {
                 const res = await axios.post(DIFY_API_URL, {
-                    inputs: {}, query: text, response_mode: "blocking", user: msg.key.remoteJid
+                    inputs: {},
+                    query: text,
+                    response_mode: "blocking",
+                    user: msg.key.remoteJid
                 }, { headers: { 'Authorization': `Bearer ${DIFY_API_KEY}` }});
+
                 await sock.sendMessage(msg.key.remoteJid, { text: res.data.answer });
             }
         }
     });
 }
 
-startBot();
-http.createServer().listen(process.env.PORT || 3000);
+connect();
+
+// Railway ke liye
+http.createServer((req, res) => res.end('ok')).listen(process.env.PORT || 3000);
