@@ -2,10 +2,14 @@
   "name": "dify-whatsapp-bot",
   "version": "1.0.0",
   "type": "module",
-  "scripts": { "start": "node index.js" },
-  "dependencies": {
-    "@whiskeysockets/baileys": "6.7.17",
-    "axios": "1.7.2"
+  "scripts": { 
+    "start": "node index.js" 
   },
-  "engines": { "node": "18.x" }
+  "dependencies": {
+    "@whiskeysockets/baileys": "6.5.0",
+    "axios": "1.6.8"
+  },
+  "engines": { 
+    "node": "18.x" 
+  }
 }
