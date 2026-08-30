@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": { "start": "node index.js" },
   "dependencies": {
-    "@whiskeysockets/baileys": "6.7.16",
+    "@whiskeysockets/baileys": "6.7.17",
     "axios": "1.7.2"
   },
   "engines": { "node": "18.x" }
