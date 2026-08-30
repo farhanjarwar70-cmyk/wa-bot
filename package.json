@@ -1,17 +1,11 @@
 {
   "name": "dify-whatsapp-bot",
   "version": "1.0.0",
-  "description": "WhatsApp bot with Dify AI",
-  "main": "index.js",
   "type": "module",
-  "scripts": {
-    "start": "node index.js"
-  },
+  "scripts": { "start": "node index.js" },
   "dependencies": {
     "@whiskeysockets/baileys": "6.7.16",
     "axios": "1.7.2"
   },
-  "engines": {
-    "node": "18.x"
-  }
+  "engines": { "node": "18.x" }
 }
