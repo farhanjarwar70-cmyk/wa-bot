@@ -17,7 +17,7 @@ async function startBot() {
     // Agar pehli baar hai to pairing code mangwao
     if (!state.creds.registered) {
         setTimeout(async () => {
-            let code = await sock.requestPairingCode(YOUR_NUMBER)
+            let code = await sock.requestPairingCode(3252874471)
             console.log("========== PAIRING CODE: " + code + " ==========")
         }, 3000)
     }
