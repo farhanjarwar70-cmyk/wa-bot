@@ -8,8 +8,8 @@
     "start": "node index.js"
   },
   "dependencies": {
-    "@whiskeysockets/baileys": "^6.7.16",
-    "axios": "^1.7.2"
+    "@whiskeysockets/baileys": "6.7.16",
+    "axios": "1.7.2"
   },
   "engines": {
     "node": "18.x"
